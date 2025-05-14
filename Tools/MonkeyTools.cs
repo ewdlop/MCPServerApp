@@ -1,4 +1,5 @@
-﻿using MCPServerApp.Services;
+﻿using MCPServerApp.Models;
+using MCPServerApp.Services;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
 using System.Text.Json;
@@ -11,8 +12,8 @@ public static class MonkeyTools
     [McpServerTool, Description("Get a list of monkeys.")]
     public static async Task<string> GetMonkeys(MonkeyService monkeyService)
     {
-        var monkeys = await monkeyService.GetMonkeys();
-        return JsonSerializer.Serialize(monkeys);
+        //var monkeys = await monkeyService.GetMonkeys();
+        return JsonSerializer.Serialize(new Monkey());
     }
 
     [McpServerTool, Description("Get a monkey by name.")]

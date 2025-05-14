@@ -8,5 +8,8 @@ public static class EchoTool
     public static string Echo(string message) => $"Hello from C#: {message}";
 
     [McpServerTool, Description("Echoes in reverse the message sent by the client.")]
-    public static string ReverseEcho(string message) => new string(message.Reverse().ToArray());
+    public static string ReverseEcho(string message) => new string([.. message.Reverse()]);
+
+    [McpServerTool, Description("Echoes in reverse the message sent by the client.")]
+    public static string Yell(string message) => message.ToUpper();
 }
