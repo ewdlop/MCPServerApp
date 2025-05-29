@@ -70,4 +70,43 @@ public static class EchoTool
         if (string.IsNullOrEmpty(message) || string.IsNullOrEmpty(oldValue)) return message;
         return message.Replace(oldValue, newValue);
     }
+
+    [McpServerTool, Description("Converts the message to lowercase.")]
+    public static string ToLowerCase(string message)
+    {
+        return string.IsNullOrEmpty(message) ? message : message.ToLower();
+    }
+
+    [McpServerTool, Description("Converts the message to uppercase.")]
+    public static string ToUpperCase(string message)
+    {
+        return string.IsNullOrEmpty(message) ? message : message.ToUpper();
+    }
+
+    [McpServerTool, Description("Trims leading and trailing whitespace from the message.")]
+    public static string Trim(string message)
+    {
+        return string.IsNullOrEmpty(message) ? message : message.Trim();
+    }
+
+    [McpServerTool, Description("Checks if the message contains a specific substring.")]
+    public static bool Contains(string message, string substring)
+    {
+        if (string.IsNullOrEmpty(message) || string.IsNullOrEmpty(substring)) return false;
+        return message.Contains(substring, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [McpServerTool, Description("Splits the message into an array of words.")]
+    public static string[] SplitIntoWords(string message)
+    {
+        if (string.IsNullOrWhiteSpace(message)) return Array.Empty<string>();
+        return message.Split(new[] { ' ', '\t', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+    }
+
+    [McpServerTool, Description("Joins an array of words into a single string with spaces.")]
+    public static string JoinWords(string[] words)
+    {
+        if (words == null || words.Length == 0) return "";
+        return string.Join(' ', words);
+    }
 }
