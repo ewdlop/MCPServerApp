@@ -124,9 +124,7 @@ public static class EchoTool
         [
             new(ChatRole.User, "Briefly summarize the following downloaded content:"),
         new(ChatRole.User, content),
-    ];
-
-        ChatOptions options = new()
+        ];        ChatOptions options = new()
         {
             MaxOutputTokens = 256,
             Temperature = 0.3f,
@@ -134,5 +132,92 @@ public static class EchoTool
 
         return $"Summary: {await thisServer.AsSamplingChatClient().GetResponseAsync(messages, options, cancellationToken)}";
     }
+
+    [McpServerTool(Name = "AnalyzeSentiment"), Description("Analyzes the sentiment of the provided text using AI")]
+    public static async Task<string> AnalyzeSentiment(
+        IMcpServer thisServer,
+        [Description("The text to analyze for sentiment")] string text,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return "No text provided for sentiment analysis.";
+
+        ChatMessage[] messages =
+        [
+            new(ChatRole.System, "You are a sentiment analysis expert. Analyze the sentiment of the following text and provide a brief response indicating whether it's positive, negative, or neutral, along with a confidence score (0-100) and a brief explanation."),
+            new(ChatRole.User, $"Analyze the sentiment of this text: \"{text}\"")
+        ];
+
+        ChatOptions options = new()
+        {
+            MaxOutputTokens = 150,
+            Temperature = 0.2f,
+        };
+
+        var response = await thisServer.AsSamplingChatClient().GetResponseAsync(messages, options, cancellationToken);
+        return $"Sentiment Analysis: {response}";
+    }
+
+    [McpServerTool(Name = "GenerateRhyme"), Description("Generates words that rhyme with the provided word using AI")]
+    public static async Task<string> GenerateRhyme(
+        IMcpServer thisServer,
+        [Description("The word to find rhymes for")] string word,
+        [Description("Number of rhymes to generate (default: 5)")] int count = 5,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(word))
+            return "No word provided for rhyme generation.";
+
+        if (count <= 0 || count > 20)
+            count = 5;
+
+        ChatMessage[] messages =
+        [
+            new(ChatRole.System, "You are a creative writing assistant specializing in wordplay and rhymes. Generate real English words that rhyme with the given word."),
+            new(ChatRole.User, $"Generate {count} words that rhyme with '{word}'. Return only the rhyming words, separated by commas.")
+        ];
+
+        ChatOptions options = new()
+        {
+            MaxOutputTokens = 100,
+            Temperature = 0.7f,
+        };
+
+        var response = await thisServer.AsSamplingChatClient().GetResponseAsync(messages, options, cancellationToken);
+        return $"Rhymes for '{word}': {response}";
+    }
+
+    [McpServerTool(Name = "ExplainConcept"), Description("Provides a simple explanation of a concept or term using AI")]
+    public static async Task<string> ExplainConcept(
+        IMcpServer thisServer,
+        [Description("The concept, term, or topic to explain")] string concept,
+        [Description("Target audience level: 'child', 'teen', 'adult', 'expert' (default: 'adult')")] string audienceLevel = "adult",
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(concept))
+            return "No concept provided for explanation.";
+
+        string systemPrompt = audienceLevel.ToLower() switch
+        {
+            "child" => "You are an educational assistant who explains concepts in simple terms that a child (ages 5-10) can understand. Use simple words and relatable examples.",
+            "teen" => "You are an educational assistant who explains concepts for teenagers (ages 13-18). Use clear language with some technical terms when appropriate.",
+            "expert" => "You are an expert educator who provides detailed, technical explanations for professionals and advanced learners.",
+            _ => "You are an educational assistant who explains concepts clearly for general adult audiences. Use accessible language while being comprehensive."
+        };
+
+        ChatMessage[] messages =
+        [
+            new(ChatRole.System, systemPrompt),
+            new(ChatRole.User, $"Explain the concept of '{concept}' in 2-3 sentences.")
+        ];
+
+        ChatOptions options = new()
+        {
+            MaxOutputTokens = 200,
+            Temperature = 0.3f,
+        };
+
+        var response = await thisServer.AsSamplingChatClient().GetResponseAsync(messages, options, cancellationToken);
+        return $"Explanation of '{concept}' (for {audienceLevel} audience): {response}";    }
 }
 
